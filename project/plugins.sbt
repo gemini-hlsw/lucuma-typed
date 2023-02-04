@@ -1,3 +1,8 @@
-addSbtPlugin("org.scala-js" % "sbt-scalajs" % "1.13.0")
-addSbtPlugin("org.typelevel" % "sbt-typelevel-sonatype" % "0.4.18")
-addSbtPlugin("org.typelevel" % "sbt-typelevel-versioning" % "0.4.18")
+addSbtPlugin("edu.gemini" % "sbt-lucuma-lib" % "0.10.8")
+
+libraryDependencies ++= Seq(
+  "org.scalablytyped.converter" %% "cli" % "1.0.0-beta41"
+)
+
+dependencyOverrides += "org.typelevel" %% "cats-effect" % "2.1.3"
+dependencyOverrides += "org.scala-lang.modules" %% "scala-xml" % "2.1.0"
