@@ -49,7 +49,7 @@ lazy val stOut = Def.setting { (npm: String) =>
 }
 
 ThisBuild / tlFatalWarnings := false
-ThisBuild / scalacOptions += Seq("-language:implicitConversions")
+ThisBuild / scalacOptions += "-language:implicitConversions"
 
 lazy val root = project
   .in(file("."))
