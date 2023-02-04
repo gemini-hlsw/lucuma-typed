@@ -169,7 +169,7 @@ lazy val reactDatepicker = project
     name := "lucuma-typed-react-datepicker",
     Compile / managedSources ++= stOut.value("react-datepicker")
   )
-  .dependsOn(reactPopper)
+  .dependsOn(reactPopper, dateFns)
   .enablePlugins(ScalaJSPlugin)
   .disablePlugins(MergifyPlugin)
 
@@ -187,7 +187,7 @@ lazy val tanstackReactTable = project
     name := "lucuma-typed-tanstack-react-table",
     Compile / managedSources ++= stOut.value("@tanstack/react-table")
   )
-  .dependsOn(tanstackTableCore)
+  .dependsOn(react, tanstackTableCore)
   .enablePlugins(ScalaJSPlugin)
   .disablePlugins(MergifyPlugin)
 
