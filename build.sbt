@@ -20,7 +20,8 @@ Global / onLoad                := {
 ThisBuild / tlBaseVersion      := "0.0"
 ThisBuild / crossScalaVersions := Seq(scala3)
 
-ThisBuild / githubWorkflowArtifactUpload := true
+ThisBuild / githubWorkflowBuildSbtStepPreamble := Seq()
+ThisBuild / githubWorkflowArtifactUpload       := true
 ThisBuild / githubWorkflowTargetBranches += "!dependabot/**"
 ThisBuild / githubWorkflowBuildPreamble ++= Seq(
   WorkflowStep.Use(
@@ -47,8 +48,12 @@ lazy val stOut = Def.setting { (npm: String) =>
   finder.get
 }
 
+ThisBuild / tlFatalWarnings := false
+ThisBuild / scalacOptions += Seq("-language:implicitConversions")
+
 lazy val root = project
   .in(file("."))
+  .enablePlugins(NoPublishPlugin)
   .aggregate(
     std,
     csstype,
