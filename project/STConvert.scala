@@ -1,7 +1,11 @@
-import com.olvind.logging.{stdout, storing, LogLevel, Logger}
+import com.olvind.logging.{LogLevel, Logger, stdout, storing}
 import fansi.{Attr, Color, Str}
 import org.scalablytyped.converter.internal.importer._
-import org.scalablytyped.converter.internal.importer.build.{BloopCompiler, PublishedSbtProject, SbtProject}
+import org.scalablytyped.converter.internal.importer.build.{
+  BloopCompiler,
+  PublishedSbtProject,
+  SbtProject
+}
 import org.scalablytyped.converter.internal.importer.documentation.Npmjs
 import org.scalablytyped.converter.internal.phases.PhaseListener.NoListener
 import org.scalablytyped.converter.internal.phases.{PhaseRes, PhaseRunner, RecPhase}
@@ -9,7 +13,7 @@ import org.scalablytyped.converter.internal.scalajs.{Name, Versions}
 import org.scalablytyped.converter.internal.sets.SetOps
 import org.scalablytyped.converter.internal.ts.CalculateLibraryVersion.PackageJsonOnly
 import org.scalablytyped.converter.internal.ts.{PackageJson, TsIdentLibrary}
-import org.scalablytyped.converter.internal.{constants, files, sets, BuildInfo, InFolder, Json}
+import org.scalablytyped.converter.internal.{BuildInfo, InFolder, Json, constants, files, sets}
 import org.scalablytyped.converter.{Flavour, Selection}
 import scopt.{OParser, OParserBuilder, Read}
 
@@ -21,36 +25,36 @@ import scala.util.{Failure, Success, Try}
 
 object STConvert {
   class Paths(base: os.Path) {
-    lazy val out: os.Path =
+    lazy val out: os.Path             =
       files.existing(base / 'out)
     val node_modules: Option[os.Path] =
       Option(base / 'node_modules).filter(files.exists)
-    val packageJson: Option[os.Path] =
+    val packageJson: Option[os.Path]  =
       Option(base / "package.json").filter(files.exists)
   }
 
   val DefaultOptions = ConversionOptions(
-    useScalaJsDomTypes       = true,
-    outputPackage            = Name.typings,
-    enableScalaJsDefined     = Selection.All,
-    flavour                  = Flavour.Normal,
-    ignored                  = SortedSet("typescript"),
-    stdLibs                  = SortedSet("es6"),
-    expandTypeMappings       = EnabledTypeMappingExpansion.DefaultSelection,
-    versions                 = Versions(Versions.Scala3, Versions.ScalaJs1),
-    organization             = "org.scalablytyped",
-    enableReactTreeShaking   = Selection.None,
-    enableLongApplyMethod    = false,
-    privateWithin            = None,
-    useDeprecatedModuleNames = false,
+    useScalaJsDomTypes = true,
+    outputPackage = Name.typings,
+    enableScalaJsDefined = Selection.All,
+    flavour = Flavour.Normal,
+    ignored = SortedSet("typescript"),
+    stdLibs = SortedSet("es6"),
+    expandTypeMappings = EnabledTypeMappingExpansion.DefaultSelection,
+    versions = Versions(Versions.Scala3, Versions.ScalaJs1),
+    organization = "org.scalablytyped",
+    enableReactTreeShaking = Selection.None,
+    enableLongApplyMethod = false,
+    privateWithin = None,
+    useDeprecatedModuleNames = false
   )
 
   case class Config(
-      conversion:     ConversionOptions,
-      wantedLibs:     SortedSet[TsIdentLibrary],
-      inDirectory:    os.Path,
-      includeDev:     Boolean,
-      includeProject: Boolean,
+    conversion:     ConversionOptions,
+    wantedLibs:     SortedSet[TsIdentLibrary],
+    inDirectory:    os.Path,
+    includeDev:     Boolean,
+    includeProject: Boolean
   ) {
     lazy val paths = new Paths(inDirectory)
     def mapConversion(f: ConversionOptions => ConversionOptions) = copy(conversion = f(conversion))
@@ -58,10 +62,10 @@ object STConvert {
 
   val DefaultConfig = Config(
     DefaultOptions,
-    wantedLibs     = SortedSet(),
-    inDirectory    = os.pwd,
-    includeDev     = false,
-    includeProject = false,
+    wantedLibs = SortedSet(),
+    inDirectory = os.pwd,
+    includeDev = false,
+    includeProject = false
   )
 
   val parseCachePath = Some(files.existing(constants.defaultCacheFolder / 'parse).toNIO)
@@ -71,7 +75,9 @@ object STConvert {
     storing().zipWith(stdout.filter(LogLevel.warn))
 
   implicit val ReadsFlavour: Read[Flavour] =
-    Read.reads(s => Flavour.byName.getOrElse(s, sys.error(s"'$s' is not among ${Flavour.byName.keys}")))
+    Read.reads(s =>
+      Flavour.byName.getOrElse(s, sys.error(s"'$s' is not among ${Flavour.byName.keys}"))
+    )
 
   implicit val ReadsVersionsScalaJs: Read[Versions.ScalaJs] =
     Read.stringRead.map(Versions.ScalaJs.apply)
@@ -88,22 +94,23 @@ object STConvert {
   implicit val ReadsOsPath: Read[os.Path] =
     Read.stringRead.map { str =>
       Try(os.Path(str)) match {
-        case Failure(_) =>
+        case Failure(_)        =>
           os.pwd / os.RelPath(str)
         case Success(absolute) => absolute
       }
     }
 
-  implicit def ReadsSelection[T: Ordering](implicit ts: Read[Seq[T]]): Read[Selection[T]] = Read.reads {
-    case "all"                  => Selection.All
-    case "none"                 => Selection.All
-    case s if s.startsWith("+") => Selection.NoneExcept(ts.reads(s.drop(1)): _*)
-    case s if s.startsWith("-") => Selection.AllExcept(ts.reads(s.drop(1)): _*)
-    case _ =>
-      sys.error(
-        "Syntax: `all`/`none` for Selection.All/Selection.None, `+a,b` for Selection.NoneExcept(a, b), `-a,b` for Selection.AllExcept(a, b)",
-      )
-  }
+  implicit def ReadsSelection[T: Ordering](implicit ts: Read[Seq[T]]): Read[Selection[T]] =
+    Read.reads {
+      case "all"                  => Selection.All
+      case "none"                 => Selection.All
+      case s if s.startsWith("+") => Selection.NoneExcept(ts.reads(s.drop(1)): _*)
+      case s if s.startsWith("-") => Selection.AllExcept(ts.reads(s.drop(1)): _*)
+      case _                      =>
+        sys.error(
+          "Syntax: `all`/`none` for Selection.All/Selection.None, `+a,b` for Selection.NoneExcept(a, b), `-a,b` for Selection.AllExcept(a, b)"
+        )
+    }
 
   val ParseConversionOptions: OParser[Unit, Config] = {
     val builder: OParserBuilder[Config] = OParser.builder[Config]
@@ -115,7 +122,9 @@ object STConvert {
       version('v', "version"),
       opt[os.Path]('d', "directory")
         .action((x, c) => c.copy(inDirectory = x))
-        .text("Specify another directory instead of the current directory where your package.json and node_modules is"),
+        .text(
+          "Specify another directory instead of the current directory where your package.json and node_modules is"
+        ),
       opt[Boolean]("includeDev")
         .action((x, c) => c.copy(includeDev = x))
         .text("Include dev dependencies"),
@@ -125,12 +134,12 @@ object STConvert {
       opt[Boolean]("useScalaJsDomTypes")
         .action((x, c) => c.mapConversion(_.copy(useScalaJsDomTypes = x)))
         .text(
-          "When true (which is the default) uses scala-js-dom types when possible instead of types we translate from typescript in std",
+          "When true (which is the default) uses scala-js-dom types when possible instead of types we translate from typescript in std"
         ),
       opt[Flavour]('f', "flavour")
         .action((x, c) => c.mapConversion(_.copy(flavour = x)))
         .text(
-          s"One of ${Flavour.byName.keys.mkString(", ")}. See https://scalablytyped.org/docs/flavour",
+          s"One of ${Flavour.byName.keys.mkString(", ")}. See https://scalablytyped.org/docs/flavour"
         ),
       opt[Versions.ScalaJs]("scalajs")
         .action((x, c) => c.mapConversion(cc => cc.copy(versions = cc.versions.copy(scalaJs = x))))
@@ -158,7 +167,9 @@ object STConvert {
         .text(s"Libraries you want to ignore"),
       opt[Boolean]("experimentalEnableImplicitOps")
         .action { (x, c) =>
-          logger.warn("--experimentalEnableImplicitOps has no effect since it became the default encoding")
+          logger.warn(
+            "--experimentalEnableImplicitOps has no effect since it became the default encoding"
+          )
           c
         }
         .text(s"Deprecated, doesn't do anything anymore"),
@@ -168,20 +179,20 @@ object STConvert {
       opt[Boolean]("shortModuleNames")
         .action((x, c) => c.mapConversion(_.copy(useDeprecatedModuleNames = x)))
         .text(
-          s"Enables short module names. This used to be the default, and is now deprecated since it's so difficult to navigate",
+          s"Enables short module names. This used to be the default, and is now deprecated since it's so difficult to navigate"
         ),
       arg[Seq[TsIdentLibrary]]("libs")
         .text("Libraries you want to convert from node_modules")
         .unbounded()
         .optional()
-        .action((x, c) => c.copy(wantedLibs = c.wantedLibs ++ x)),
+        .action((x, c) => c.copy(wantedLibs = c.wantedLibs ++ x))
     )
   }
 
   def table(Key: Attr)(kvs: (String, String)*): Str = {
     val headerLength = kvs.map { case (header, _) => header }.maxBy(_.length).length + 1
-    val massaged = kvs.flatMap {
-      case (header, value) => Seq[Str](Key(header.padTo(headerLength, ' ')), value, "\n")
+    val massaged     = kvs.flatMap { case (header, value) =>
+      Seq[Str](Key(header.padTo(headerLength, ' ')), value, "\n")
     }
     Str.join(massaged)
   }
@@ -189,66 +200,73 @@ object STConvert {
   def main(args: Array[String]): Unit =
     OParser.parse(ParseConversionOptions, args, DefaultConfig) match {
       case Some(
-          c @ Config(
-            conversion,
-            libsFromCmdLine,
-            inDir,
-            includeDev,
-            includeProject,
-          ),
+            c @ Config(
+              conversion,
+              libsFromCmdLine,
+              inDir,
+              includeDev,
+              includeProject
+            )
           ) =>
-        val packageJsonPath = c.paths.packageJson.getOrElse(sys.error(s"$inDir does not contain package.json"))
-        val nodeModulesPath = c.paths.node_modules.getOrElse(sys.error(s"$inDir does not contain node_modules"))
+        val packageJsonPath =
+          c.paths.packageJson.getOrElse(sys.error(s"$inDir does not contain package.json"))
+        val nodeModulesPath =
+          c.paths.node_modules.getOrElse(sys.error(s"$inDir does not contain node_modules"))
         require(files.exists(nodeModulesPath / "typescript" / "lib"), "must install typescript")
 
         val packageJson = Json.force[PackageJson](packageJsonPath)
 
         val projectSource: Option[LibTsSource.FromFolder] =
-          if (includeProject) Some(LibTsSource.FromFolder(InFolder(inDir), TsIdentLibrary(inDir.last))) else None
+          if (includeProject)
+            Some(LibTsSource.FromFolder(InFolder(inDir), TsIdentLibrary(inDir.last)))
+          else None
 
         val wantedLibs: SortedSet[TsIdentLibrary] =
           libsFromCmdLine match {
             case sets.EmptySet() =>
               val fromPackageJson = packageJson.allLibs(includeDev, peer = true).keySet
               require(fromPackageJson.nonEmpty, "No libraries found in package.json")
-              val ret = fromPackageJson -- conversion.ignoredLibs
+              val ret             = fromPackageJson -- conversion.ignoredLibs
               require(ret.nonEmpty, s"All libraries in package.json ignored")
               ret
-            case otherwise => otherwise
+            case otherwise       => otherwise
           }
 
-        val bootstrapped = Bootstrap.fromNodeModules(InFolder(nodeModulesPath), conversion, wantedLibs)
+        val bootstrapped =
+          Bootstrap.fromNodeModules(InFolder(nodeModulesPath), conversion, wantedLibs)
 
-        val sources: Vector[LibTsSource] = {
+        val sources: Vector[LibTsSource] =
           bootstrapped.initialLibs match {
             case Left(unresolved) => sys.error(unresolved.msg)
             case Right(initial)   => projectSource.foldLeft(initial)(_ :+ _)
           }
-        }
 
         println(
           table(fansi.Color.LightBlue)(
-            "directory" -> inDir.toString,
-            "includeDev" -> includeDev.toString,
-            "includeProject" -> includeProject.toString,
-            "wantedLibs" -> sources.map(s => s.libName.value).mkString(", "),
-            "useScalaJsDomTypes" -> conversion.useScalaJsDomTypes.toString,
-            "flavour" -> conversion.flavour.toString,
-            "outputPackage" -> conversion.outputPackage.unescaped,
-            "enableScalaJsDefined" -> conversion.enableScalaJsDefined.map(_.value).toString,
-            "stdLibs" -> conversion.stdLibs.toString,
-            "expandTypeMappings" -> conversion.expandTypeMappings.map(_.value).toString,
-            "ignoredLibs" -> conversion.ignoredLibs.map(_.value).toString,
+            "directory"             -> inDir.toString,
+            "includeDev"            -> includeDev.toString,
+            "includeProject"        -> includeProject.toString,
+            "wantedLibs"            -> sources.map(s => s.libName.value).mkString(", "),
+            "useScalaJsDomTypes"    -> conversion.useScalaJsDomTypes.toString,
+            "flavour"               -> conversion.flavour.toString,
+            "outputPackage"         -> conversion.outputPackage.unescaped,
+            "enableScalaJsDefined"  -> conversion.enableScalaJsDefined.map(_.value).toString,
+            "stdLibs"               -> conversion.stdLibs.toString,
+            "expandTypeMappings"    -> conversion.expandTypeMappings.map(_.value).toString,
+            "ignoredLibs"           -> conversion.ignoredLibs.map(_.value).toString,
 //            "ignoredModulePrefixes" -> conversion.ignoredModulePrefixes.toString,
-            "versions" -> conversion.versions.toString,
-            "organization" -> conversion.organization,
-            "enableLongApplyMethod" -> conversion.enableLongApplyMethod.toString,
-          ),
+            "versions"              -> conversion.versions.toString,
+            "organization"          -> conversion.organization,
+            "enableLongApplyMethod" -> conversion.enableLongApplyMethod.toString
+          )
         )
 
         val compiler = Await.result(
-          BloopCompiler(logger.filter(LogLevel.debug).void, conversion.versions, failureCacheFolderOpt = None),
-          Duration.Inf,
+          BloopCompiler(logger.filter(LogLevel.debug).void,
+                        conversion.versions,
+                        failureCacheFolderOpt = None
+          ),
+          Duration.Inf
         )
 
         val Pipeline: RecPhase[LibTsSource, PublishedSbtProject] =
@@ -256,64 +274,73 @@ object STConvert {
             .next(
               new Phase1ReadTypescript(
                 calculateLibraryVersion = PackageJsonOnly,
-                resolve                 = bootstrapped.libraryResolver,
-                ignored                 = conversion.ignoredLibs,
-                ignoredModulePrefixes   = conversion.ignoredModulePrefixes,
-                pedantic                = false,
-                parser                  = PersistingParser(parseCachePath, bootstrapped.inputFolders, logger.void),
-                expandTypeMappings      = conversion.expandTypeMappings,
+                resolve = bootstrapped.libraryResolver,
+                ignored = conversion.ignoredLibs,
+                ignoredModulePrefixes = conversion.ignoredModulePrefixes,
+                pedantic = false,
+                parser = PersistingParser(parseCachePath, bootstrapped.inputFolders, logger.void),
+                expandTypeMappings = conversion.expandTypeMappings
               ),
-              "typescript",
+              "typescript"
             )
             .next(
               new Phase2ToScalaJs(
-                pedantic                 = false,
-                scalaVersion             = conversion.versions.scala,
-                enableScalaJsDefined     = conversion.enableScalaJsDefined,
-                outputPkg                = conversion.outputPackage,
-                flavour                  = conversion.flavourImpl,
-                useDeprecatedModuleNames = conversion.useDeprecatedModuleNames,
+                pedantic = false,
+                scalaVersion = conversion.versions.scala,
+                enableScalaJsDefined = conversion.enableScalaJsDefined,
+                outputPkg = conversion.outputPackage,
+                flavour = conversion.flavourImpl,
+                useDeprecatedModuleNames = conversion.useDeprecatedModuleNames
               ),
-              "scala.js",
+              "scala.js"
             )
             .next(
-              new PhaseFlavour(conversion.flavourImpl, maybePrivateWithin = conversion.privateWithin),
-              conversion.flavourImpl.toString,
+              new PhaseFlavour(conversion.flavourImpl,
+                               maybePrivateWithin = conversion.privateWithin
+              ),
+              conversion.flavourImpl.toString
             )
             .next(
               new Phase3Compile(
-                versions                   = conversion.versions,
-                compiler                   = compiler,
-                targetFolder               = c.paths.out,
-                organization               = conversion.organization,
-                publishLocalFolder         = constants.defaultLocalPublishFolder,
-                metadataFetcher            = Npmjs.No,
-                softWrites                 = true,
-                flavour                    = conversion.flavourImpl,
+                versions = conversion.versions,
+                compiler = compiler,
+                targetFolder = c.paths.out,
+                organization = conversion.organization,
+                publishLocalFolder = constants.defaultLocalPublishFolder,
+                metadataFetcher = Npmjs.No,
+                softWrites = true,
+                flavour = conversion.flavourImpl,
                 generateScalaJsBundlerFile = false,
-                ensureSourceFilesWritten   = true,
+                ensureSourceFilesWritten = true
               ),
-              "build",
+              "build"
             )
 
         val results: Map[LibTsSource, PhaseRes[LibTsSource, PublishedSbtProject]] =
           sources
-            .map(source => source -> PhaseRunner(Pipeline, (_: LibTsSource) => logger.void, NoListener)(source))
+            .map(source =>
+              source -> PhaseRunner(Pipeline, (_: LibTsSource) => logger.void, NoListener)(source)
+            )
             .toMap
 
         val td = System.currentTimeMillis - t0
         logger.warn(td)
 
         val failures: Map[LibTsSource, Either[Throwable, String]] =
-          results.collect { case (_, PhaseRes.Failure(errors)) => errors }.reduceOption(_ ++ _).getOrElse(Map.empty)
+          results
+            .collect { case (_, PhaseRes.Failure(errors)) => errors }
+            .reduceOption(_ ++ _)
+            .getOrElse(Map.empty)
 
         if (failures.nonEmpty) {
           println(
-            Color.Red(s"Failure: You might try --ignoredLibs ${failures.keys.map(_.libName.value).mkString(", ")}"),
+            Color.Red(
+              s"Failure: You might try --ignoredLibs ${failures.keys.map(_.libName.value).mkString(", ")}"
+            )
           )
 
           failures.foreach {
-            case (source, Left(value)) =>
+            case (source, Left(value))  =>
               println(s"${source.libName.value}: (${source.path})")
               value.printStackTrace()
             case (source, Right(value)) =>
@@ -323,10 +350,16 @@ object STConvert {
           System.exit(1)
         } else {
           val allSuccesses: Map[LibTsSource, PublishedSbtProject] = {
-            def go(source: LibTsSource, p: PublishedSbtProject): Map[LibTsSource, PublishedSbtProject] =
+            def go(
+              source: LibTsSource,
+              p:      PublishedSbtProject
+            ): Map[LibTsSource, PublishedSbtProject] =
               Map(source -> p) ++ p.project.deps.flatMap { case (k, v) => go(k, v) }
 
-            results.collect { case (s, PhaseRes.Ok(res)) => go(s, res) }.reduceOption(_ ++ _).getOrElse(Map.empty)
+            results
+              .collect { case (s, PhaseRes.Ok(res)) => go(s, res) }
+              .reduceOption(_ ++ _)
+              .getOrElse(Map.empty)
           }
 
           val short: Seq[SbtProject] =
@@ -337,7 +370,9 @@ object STConvert {
               .sortBy(_.name)
 
           println()
-          println(s"Successfully converted ${allSuccesses.keys.map(x => Color.Green(x.libName.value)).mkString(", ")}")
+          println(
+            s"Successfully converted ${allSuccesses.keys.map(x => Color.Green(x.libName.value)).mkString(", ")}"
+          )
           println("To use in sbt: ")
           println(Color.DarkGray(s"""libraryDependencies ++= Seq(
                |  ${short.map(p => p.reference.asSbt).mkString("", ",\n  ", "")}
