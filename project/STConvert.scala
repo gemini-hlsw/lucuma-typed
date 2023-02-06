@@ -41,7 +41,7 @@ import scala.util.{Failure, Success, Try}
 object STConvert {
   class Paths(base: os.Path) {
     lazy val out: os.Path             =
-      files.existing(base / 'out)
+      files.existing(base / 'target / "scalably-typed")
     val node_modules: Option[os.Path] =
       Option(base / 'node_modules).filter(files.exists)
     val packageJson: Option[os.Path]  =

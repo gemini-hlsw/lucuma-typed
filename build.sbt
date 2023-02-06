@@ -31,8 +31,8 @@ ThisBuild / mergifyPrRules +=
 lazy val stOut = Def.setting { (npm: String) =>
   val fn                 = npm.replace("@", "").replace("/", "__")
   val finder: PathFinder =
-    (ThisBuild / baseDirectory).value /
-      "out" / fn(0).toString / fn / "src" / "main" ** "*.scala"
+    (LocalRootProject / target).value /
+      "scalably-typed" / fn(0).toString / fn / "src" / "main" ** "*.scala"
   finder.get
 }
 
