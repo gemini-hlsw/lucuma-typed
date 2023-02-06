@@ -20,6 +20,7 @@ Global / onLoad                := {
 ThisBuild / tlBaseVersion      := "0.0"
 ThisBuild / crossScalaVersions := Seq(scala3)
 
+ThisBuild / tlCiReleaseBranches                := Seq("main")
 ThisBuild / githubWorkflowBuildSbtStepPreamble := Seq()
 ThisBuild / githubWorkflowArtifactUpload       := true
 ThisBuild / githubWorkflowTargetBranches += "!dependabot/**"
