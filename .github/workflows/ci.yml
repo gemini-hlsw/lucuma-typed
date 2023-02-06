@@ -75,6 +75,8 @@ jobs:
       - name: Check that workflows are up to date
         run: sbt githubWorkflowCheck
 
+      - run: sbt lucumaTypedGenerate
+
       - name: Check headers and formatting
         if: matrix.java == 'temurin@17'
         run: sbt headerCheckAll scalafmtCheckAll 'project /' scalafmtSbtCheck lucumaScalafmtCheck lucumaScalafixCheck

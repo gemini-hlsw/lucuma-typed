@@ -1,7 +1,43 @@
 val scala3 = "3.2.2"
 
-Global / onLoad                := {
-  val old = (Global / onLoad).value
+ThisBuild / tlBaseVersion      := "0.0"
+ThisBuild / crossScalaVersions := Seq(scala3)
+
+ThisBuild / tlCiReleaseBranches                := Seq("main")
+ThisBuild / githubWorkflowBuildSbtStepPreamble := Seq()
+ThisBuild / githubWorkflowArtifactUpload       := true
+ThisBuild / githubWorkflowTargetBranches += "!dependabot/**"
+ThisBuild / githubWorkflowBuildPreamble ++= Seq(
+  WorkflowStep.Use(
+    UseRef.Public("actions", "setup-node", "v3"),
+    params = Map("node-version" -> "18", "cache" -> "npm")
+  ),
+  WorkflowStep.Run(
+    List("npm install")
+  )
+)
+
+ThisBuild / githubWorkflowBuild ~= { steps =>
+  WorkflowStep.Sbt(List("lucumaTypedGenerate")) +: steps
+}
+
+ThisBuild / mergifyPrRules +=
+  MergifyPrRule(
+    "merge dependabot PRs",
+    MergifyCondition.Custom("author=dependabot[bot]") :: mergifySuccessConditions.value.toList,
+    List(MergifyAction.Merge())
+  )
+
+lazy val stOut = Def.setting { (npm: String) =>
+  val fn                 = npm.replace("@", "").replace("/", "__")
+  val finder: PathFinder =
+    (ThisBuild / baseDirectory).value /
+      "out" / fn(0).toString / fn / "src" / "main" ** "*.scala"
+  finder.get
+}
+
+lazy val lucumaTypedGenerate = taskKey[Unit]("Generate the ST facades")
+lucumaTypedGenerate         := {
   STConvert.main(
     Array(
       "--outputPackage",
@@ -25,40 +61,6 @@ Global / onLoad                := {
     if (transformed != content)
       IO.write(f, transformed)
   }
-
-  old
-}
-
-ThisBuild / tlBaseVersion      := "0.0"
-ThisBuild / crossScalaVersions := Seq(scala3)
-
-ThisBuild / tlCiReleaseBranches                := Seq("main")
-ThisBuild / githubWorkflowBuildSbtStepPreamble := Seq()
-ThisBuild / githubWorkflowArtifactUpload       := true
-ThisBuild / githubWorkflowTargetBranches += "!dependabot/**"
-ThisBuild / githubWorkflowBuildPreamble ++= Seq(
-  WorkflowStep.Use(
-    UseRef.Public("actions", "setup-node", "v3"),
-    params = Map("node-version" -> "18", "cache" -> "npm")
-  ),
-  WorkflowStep.Run(
-    List("npm install")
-  )
-)
-
-ThisBuild / mergifyPrRules +=
-  MergifyPrRule(
-    "merge dependabot PRs",
-    MergifyCondition.Custom("author=dependabot[bot]") :: mergifySuccessConditions.value.toList,
-    List(MergifyAction.Merge())
-  )
-
-lazy val stOut = Def.setting { (npm: String) =>
-  val fn                 = npm.replace("@", "").replace("/", "__")
-  val finder: PathFinder =
-    (ThisBuild / baseDirectory).value /
-      "out" / fn(0).toString / fn / "src" / "main" ** "*.scala"
-  finder.get
 }
 
 ThisBuild / tlFatalWarnings := false
