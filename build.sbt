@@ -86,6 +86,7 @@ lazy val root = project
     reactDatepicker,
     tanstackTableCore,
     tanstackReactTable,
+    tanstackVirtualCore,
     tanstackReactVirtual
   )
 
@@ -219,11 +220,20 @@ lazy val tanstackReactTable = project
   .enablePlugins(ScalaJSPlugin)
   .disablePlugins(MergifyPlugin)
 
+lazy val tanstackVirtualCore = project
+  .settings(
+    name := "lucuma-typed-tanstack-react-virtual"
+  )
+  .settings(facadeSettings("@tanstack/virtual-core"))
+  .dependsOn(std)
+  .enablePlugins(ScalaJSPlugin)
+  .disablePlugins(MergifyPlugin)
+
 lazy val tanstackReactVirtual = project
   .settings(
     name := "lucuma-typed-tanstack-react-virtual"
   )
   .settings(facadeSettings("@tanstack/react-virtual"))
-  .dependsOn(react)
+  .dependsOn(react, tanstackVirtualCore)
   .enablePlugins(ScalaJSPlugin)
   .disablePlugins(MergifyPlugin)
