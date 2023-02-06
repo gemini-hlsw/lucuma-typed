@@ -28,11 +28,14 @@ ThisBuild / mergifyPrRules +=
     List(MergifyAction.Merge())
   )
 
+lazy val stBase = Def.setting { (npm: String) =>
+  val fn = npm.replace("@", "").replace("/", "__")
+
+  (LocalRootProject / target).value / "scalably-typed" / fn(0).toString / fn
+}
+
 lazy val stOut = Def.setting { (npm: String) =>
-  val fn                 = npm.replace("@", "").replace("/", "__")
-  val finder: PathFinder =
-    (LocalRootProject / target).value /
-      "scalably-typed" / fn(0).toString / fn / "src" / "main" ** "*.scala"
+  val finder: PathFinder = stBase.value(npm) / "src" / "main" ** "*.scala"
   finder.get
 }
 
@@ -86,131 +89,141 @@ lazy val root = project
     tanstackReactVirtual
   )
 
+def facadeSettings(npm: String) = Seq(
+  Compile / managedSources ++= stOut.value(npm),
+  Compile / packageSrc / mappings := {
+    val base = stBase.value(npm)
+    (Compile / managedSources).value.map { file =>
+      file -> file.relativeTo(base).get.getPath
+    }
+  }
+)
+
 lazy val std = project
   .settings(
     name := "lucuma-typed-std",
-    Compile / managedSources ++= stOut.value("std"),
     libraryDependencies ++= Seq(
       "com.github.japgolly.scalajs-react" %%% "core"                  % "2.1.1",
       "com.olvind"                        %%% "scalablytyped-runtime" % "2.4.2"
     )
   )
+  .settings(facadeSettings("std"))
   .enablePlugins(ScalaJSPlugin)
   .disablePlugins(MergifyPlugin)
 
 lazy val csstype = project
   .settings(
-    name := "lucuma-typed-csstype",
-    Compile / managedSources ++= stOut.value("csstype")
+    name := "lucuma-typed-csstype"
   )
+  .settings(facadeSettings("csstype"))
   .dependsOn(std)
   .enablePlugins(ScalaJSPlugin)
   .disablePlugins(MergifyPlugin)
 
 lazy val dateFns = project
   .settings(
-    name := "lucuma-typed-date-fns",
-    Compile / managedSources ++= stOut.value("date-fns")
+    name := "lucuma-typed-date-fns"
   )
+  .settings(facadeSettings("date-fns"))
   .dependsOn(std)
   .enablePlugins(ScalaJSPlugin)
   .disablePlugins(MergifyPlugin)
 
 lazy val highcharts = project
   .settings(
-    name := "lucuma-typed-highcharts",
-    Compile / managedSources ++= stOut.value("highcharts")
+    name := "lucuma-typed-highcharts"
   )
+  .settings(facadeSettings("highcharts"))
   .dependsOn(std)
   .enablePlugins(ScalaJSPlugin)
   .disablePlugins(MergifyPlugin)
 
 lazy val propTypes = project
   .settings(
-    name := "lucuma-typed-prop-types",
-    Compile / managedSources ++= stOut.value("prop-types")
+    name := "lucuma-typed-prop-types"
   )
+  .settings(facadeSettings("prop-types"))
   .dependsOn(std)
   .enablePlugins(ScalaJSPlugin)
   .disablePlugins(MergifyPlugin)
 
 lazy val scheduler = project
   .settings(
-    name := "lucuma-typed-scheduler",
-    Compile / managedSources ++= stOut.value("scheduler")
+    name := "lucuma-typed-scheduler"
   )
+  .settings(facadeSettings("scheduler"))
   .dependsOn(std)
   .enablePlugins(ScalaJSPlugin)
   .disablePlugins(MergifyPlugin)
 
 lazy val react = project
   .settings(
-    name := "lucuma-typed-react",
-    Compile / managedSources ++= stOut.value("react")
+    name := "lucuma-typed-react"
   )
+  .settings(facadeSettings("react"))
   .dependsOn(csstype, propTypes, scheduler)
   .enablePlugins(ScalaJSPlugin)
   .disablePlugins(MergifyPlugin)
 
 lazy val reactTransitionGroup = project
   .settings(
-    name := "lucuma-typed-react-transition-group",
-    Compile / managedSources ++= stOut.value("react-transition-group")
+    name := "lucuma-typed-react-transition-group"
   )
+  .settings(facadeSettings("react-transition-group"))
   .dependsOn(react)
   .enablePlugins(ScalaJSPlugin)
   .disablePlugins(MergifyPlugin)
 
 lazy val primereact = project
   .settings(
-    name := "lucuma-typed-primereact",
-    Compile / managedSources ++= stOut.value("primereact")
+    name := "lucuma-typed-primereact"
   )
+  .settings(facadeSettings("primereact"))
   .dependsOn(reactTransitionGroup)
   .enablePlugins(ScalaJSPlugin)
   .disablePlugins(MergifyPlugin)
 
 lazy val reactPopper = project
   .settings(
-    name := "lucuma-typed-react-popper",
-    Compile / managedSources ++= stOut.value("react-popper")
+    name := "lucuma-typed-react-popper"
   )
+  .settings(facadeSettings("react-popper"))
   .dependsOn(react)
   .enablePlugins(ScalaJSPlugin)
   .disablePlugins(MergifyPlugin)
 
 lazy val reactDatepicker = project
   .settings(
-    name := "lucuma-typed-react-datepicker",
-    Compile / managedSources ++= stOut.value("react-datepicker")
+    name := "lucuma-typed-react-datepicker"
   )
+  .settings(facadeSettings("react-datepicker"))
   .dependsOn(reactPopper, dateFns)
   .enablePlugins(ScalaJSPlugin)
   .disablePlugins(MergifyPlugin)
 
 lazy val tanstackTableCore = project
   .settings(
-    name := "lucuma-typed-tanstack-table-core",
-    Compile / managedSources ++= stOut.value("@tanstack/table-core")
+    name := "lucuma-typed-tanstack-table-core"
   )
+  .settings(facadeSettings("@tanstack/table-core"))
   .dependsOn(std)
   .enablePlugins(ScalaJSPlugin)
   .disablePlugins(MergifyPlugin)
 
 lazy val tanstackReactTable = project
   .settings(
-    name := "lucuma-typed-tanstack-react-table",
-    Compile / managedSources ++= stOut.value("@tanstack/react-table")
+    name := "lucuma-typed-tanstack-react-table"
   )
+  .settings(facadeSettings("@tanstack/react-table"))
   .dependsOn(react, tanstackTableCore)
   .enablePlugins(ScalaJSPlugin)
   .disablePlugins(MergifyPlugin)
 
 lazy val tanstackReactVirtual = project
   .settings(
-    name := "lucuma-typed-tanstack-react-virtual",
-    Compile / managedSources ++= stOut.value("@tanstack/react-virtual")
+    name := "lucuma-typed-tanstack-react-virtual"
   )
+  .settings(facadeSettings("@tanstack/react-virtual"))
   .dependsOn(react)
   .enablePlugins(ScalaJSPlugin)
   .disablePlugins(MergifyPlugin)
