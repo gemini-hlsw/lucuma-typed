@@ -222,7 +222,7 @@ lazy val tanstackReactTable = project
 
 lazy val tanstackVirtualCore = project
   .settings(
-    name := "lucuma-typed-tanstack-react-virtual"
+    name := "lucuma-typed-tanstack-virtual-core"
   )
   .settings(facadeSettings("@tanstack/virtual-core"))
   .dependsOn(std)
