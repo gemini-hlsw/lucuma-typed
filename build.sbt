@@ -36,7 +36,8 @@ ThisBuild / tlCiReleaseBranches                := Seq("main")
 ThisBuild / githubWorkflowBuildSbtStepPreamble := Seq()
 ThisBuild / githubWorkflowArtifactUpload       := true
 ThisBuild / githubWorkflowTargetBranches += "!dependabot/**"
-ThisBuild / githubWorkflowBuildPreamble ++= Seq(
+
+lazy val npmInstallSteps = Seq(
   WorkflowStep.Use(
     UseRef.Public("actions", "setup-node", "v3"),
     params = Map("node-version" -> "18", "cache" -> "npm")
@@ -45,6 +46,8 @@ ThisBuild / githubWorkflowBuildPreamble ++= Seq(
     List("npm install")
   )
 )
+ThisBuild / githubWorkflowBuildPreamble ++= npmInstallSteps
+ThisBuild / githubWorkflowPublishPreamble ++= npmInstallSteps
 
 ThisBuild / mergifyPrRules +=
   MergifyPrRule(
