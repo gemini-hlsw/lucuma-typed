@@ -14,6 +14,18 @@ Global / onLoad                := {
       scalaJSVersion
     )
   )
+
+  stOut.value("primereact").foreach { f =>
+    val content     = IO.read(f)
+    // use the ESM-style sources in imports
+    val transformed = content.replaceAll(
+      """@JSImport\("primereact\/((.+?)(?<!\.esm))",""",
+      """@JSImport("primereact/$1.esm","""
+    )
+    if (transformed != content)
+      IO.write(f, transformed)
+  }
+
   old
 }
 
