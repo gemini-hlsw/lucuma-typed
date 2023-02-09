@@ -8,11 +8,134 @@
 pull_request_rules:
 - name: merge scala-steward's PRs
   conditions:
-  - author=scala-steward
-  - body~=labels:.*early-semver-patch
+  - author=lucuma-steward[bot]
+  - or:
+    - body~=labels:.*early-semver-patch
+    - body~=labels:.*early-semver-minor
+    - 'title=flake.lock: Update'
   - status-success=Build and Test (ubuntu-latest, 3.2.2, temurin@17)
   actions:
     merge: {}
+- name: Label csstype PRs
+  conditions:
+  - files~=^csstype/
+  actions:
+    label:
+      add:
+      - csstype
+      remove: []
+- name: Label dateFns PRs
+  conditions:
+  - files~=^dateFns/
+  actions:
+    label:
+      add:
+      - dateFns
+      remove: []
+- name: Label highcharts PRs
+  conditions:
+  - files~=^highcharts/
+  actions:
+    label:
+      add:
+      - highcharts
+      remove: []
+- name: Label primereact PRs
+  conditions:
+  - files~=^primereact/
+  actions:
+    label:
+      add:
+      - primereact
+      remove: []
+- name: Label propTypes PRs
+  conditions:
+  - files~=^propTypes/
+  actions:
+    label:
+      add:
+      - propTypes
+      remove: []
+- name: Label react PRs
+  conditions:
+  - files~=^react/
+  actions:
+    label:
+      add:
+      - react
+      remove: []
+- name: Label reactDatepicker PRs
+  conditions:
+  - files~=^reactDatepicker/
+  actions:
+    label:
+      add:
+      - reactDatepicker
+      remove: []
+- name: Label reactPopper PRs
+  conditions:
+  - files~=^reactPopper/
+  actions:
+    label:
+      add:
+      - reactPopper
+      remove: []
+- name: Label reactTransitionGroup PRs
+  conditions:
+  - files~=^reactTransitionGroup/
+  actions:
+    label:
+      add:
+      - reactTransitionGroup
+      remove: []
+- name: Label scheduler PRs
+  conditions:
+  - files~=^scheduler/
+  actions:
+    label:
+      add:
+      - scheduler
+      remove: []
+- name: Label std PRs
+  conditions:
+  - files~=^std/
+  actions:
+    label:
+      add:
+      - std
+      remove: []
+- name: Label tanstackReactTable PRs
+  conditions:
+  - files~=^tanstackReactTable/
+  actions:
+    label:
+      add:
+      - tanstackReactTable
+      remove: []
+- name: Label tanstackReactVirtual PRs
+  conditions:
+  - files~=^tanstackReactVirtual/
+  actions:
+    label:
+      add:
+      - tanstackReactVirtual
+      remove: []
+- name: Label tanstackTableCore PRs
+  conditions:
+  - files~=^tanstackTableCore/
+  actions:
+    label:
+      add:
+      - tanstackTableCore
+      remove: []
+- name: Label tanstackVirtualCore PRs
+  conditions:
+  - files~=^tanstackVirtualCore/
+  actions:
+    label:
+      add:
+      - tanstackVirtualCore
+      remove: []
 - name: merge dependabot PRs
   conditions:
   - author=dependabot[bot]

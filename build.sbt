@@ -110,7 +110,6 @@ lazy val std = project
   )
   .settings(facadeSettings("std"))
   .enablePlugins(ScalaJSPlugin)
-  .disablePlugins(MergifyPlugin)
 
 lazy val csstype = project
   .settings(
@@ -119,7 +118,6 @@ lazy val csstype = project
   .settings(facadeSettings("csstype"))
   .dependsOn(std)
   .enablePlugins(ScalaJSPlugin)
-  .disablePlugins(MergifyPlugin)
 
 lazy val dateFns = project
   .settings(
@@ -128,7 +126,6 @@ lazy val dateFns = project
   .settings(facadeSettings("date-fns"))
   .dependsOn(std)
   .enablePlugins(ScalaJSPlugin)
-  .disablePlugins(MergifyPlugin)
 
 lazy val highcharts = project
   .settings(
@@ -137,7 +134,6 @@ lazy val highcharts = project
   .settings(facadeSettings("highcharts"))
   .dependsOn(std)
   .enablePlugins(ScalaJSPlugin)
-  .disablePlugins(MergifyPlugin)
 
 lazy val propTypes = project
   .settings(
@@ -146,7 +142,6 @@ lazy val propTypes = project
   .settings(facadeSettings("prop-types"))
   .dependsOn(std)
   .enablePlugins(ScalaJSPlugin)
-  .disablePlugins(MergifyPlugin)
 
 lazy val scheduler = project
   .settings(
@@ -155,7 +150,6 @@ lazy val scheduler = project
   .settings(facadeSettings("scheduler"))
   .dependsOn(std)
   .enablePlugins(ScalaJSPlugin)
-  .disablePlugins(MergifyPlugin)
 
 lazy val react = project
   .settings(
@@ -164,7 +158,6 @@ lazy val react = project
   .settings(facadeSettings("react"))
   .dependsOn(csstype, propTypes, scheduler)
   .enablePlugins(ScalaJSPlugin)
-  .disablePlugins(MergifyPlugin)
 
 lazy val reactTransitionGroup = project
   .settings(
@@ -173,7 +166,6 @@ lazy val reactTransitionGroup = project
   .settings(facadeSettings("react-transition-group"))
   .dependsOn(react)
   .enablePlugins(ScalaJSPlugin)
-  .disablePlugins(MergifyPlugin)
 
 lazy val primereact = project
   .settings(
@@ -182,7 +174,6 @@ lazy val primereact = project
   .settings(facadeSettings("primereact"))
   .dependsOn(reactTransitionGroup)
   .enablePlugins(ScalaJSPlugin)
-  .disablePlugins(MergifyPlugin)
 
 lazy val reactPopper = project
   .settings(
@@ -191,7 +182,6 @@ lazy val reactPopper = project
   .settings(facadeSettings("react-popper"))
   .dependsOn(react)
   .enablePlugins(ScalaJSPlugin)
-  .disablePlugins(MergifyPlugin)
 
 lazy val reactDatepicker = project
   .settings(
@@ -200,7 +190,6 @@ lazy val reactDatepicker = project
   .settings(facadeSettings("react-datepicker"))
   .dependsOn(reactPopper, dateFns)
   .enablePlugins(ScalaJSPlugin)
-  .disablePlugins(MergifyPlugin)
 
 lazy val tanstackTableCore = project
   .settings(
@@ -209,7 +198,6 @@ lazy val tanstackTableCore = project
   .settings(facadeSettings("@tanstack/table-core"))
   .dependsOn(std)
   .enablePlugins(ScalaJSPlugin)
-  .disablePlugins(MergifyPlugin)
 
 lazy val tanstackReactTable = project
   .settings(
@@ -218,7 +206,6 @@ lazy val tanstackReactTable = project
   .settings(facadeSettings("@tanstack/react-table"))
   .dependsOn(react, tanstackTableCore)
   .enablePlugins(ScalaJSPlugin)
-  .disablePlugins(MergifyPlugin)
 
 lazy val tanstackVirtualCore = project
   .settings(
@@ -227,7 +214,6 @@ lazy val tanstackVirtualCore = project
   .settings(facadeSettings("@tanstack/virtual-core"))
   .dependsOn(std)
   .enablePlugins(ScalaJSPlugin)
-  .disablePlugins(MergifyPlugin)
 
 lazy val tanstackReactVirtual = project
   .settings(
@@ -236,4 +222,3 @@ lazy val tanstackReactVirtual = project
   .settings(facadeSettings("@tanstack/react-virtual"))
   .dependsOn(react, tanstackVirtualCore)
   .enablePlugins(ScalaJSPlugin)
-  .disablePlugins(MergifyPlugin)
