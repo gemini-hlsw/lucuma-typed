@@ -1,6 +1,6 @@
 val scala3 = "3.2.2"
 
-ThisBuild / tlBaseVersion      := "0.3"
+ThisBuild / tlBaseVersion      := "0.4"
 ThisBuild / crossScalaVersions := Seq(scala3)
 
 ThisBuild / tlCiReleaseBranches                := Seq("main")
