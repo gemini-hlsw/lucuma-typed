@@ -40,7 +40,7 @@ lazy val stOut = Def.setting { (npm: String) =>
 }
 
 lazy val lucumaTypedGenerate = taskKey[Unit]("Generate the ST facades")
-lucumaTypedGenerate         := {
+lucumaTypedGenerate := {
   STConvert.main(
     Array(
       "--outputPackage",
