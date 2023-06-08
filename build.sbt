@@ -1,4 +1,4 @@
-val scala3 = "3.2.2"
+val scala3 = "3.3.0"
 
 ThisBuild / tlBaseVersion      := "0.5"
 ThisBuild / crossScalaVersions := Seq(scala3)
