@@ -1,4 +1,4 @@
-addSbtPlugin("edu.gemini" % "sbt-lucuma-lib" % "0.10.13")
+addSbtPlugin("edu.gemini" % "sbt-lucuma-lib" % "0.11.0")
 
 libraryDependencies ++= Seq(
   "org.scalablytyped.converter" %% "cli" % "1.0.0-beta41"
