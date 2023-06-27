@@ -4,6 +4,7 @@ ThisBuild / tlBaseVersion      := "0.5"
 ThisBuild / crossScalaVersions := Seq(scala3)
 
 ThisBuild / tlCiReleaseBranches                := Seq("main")
+ThisBuild / githubWorkflowBuildTimeoutMinutes  := Some(120)
 ThisBuild / githubWorkflowBuildSbtStepPreamble := Seq()
 ThisBuild / githubWorkflowArtifactUpload       := true
 ThisBuild / githubWorkflowTargetBranches += "!dependabot/**"
