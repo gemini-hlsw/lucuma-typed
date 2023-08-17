@@ -49,7 +49,7 @@ jobs:
 
       - name: sbt update
         if: matrix.java == 'temurin@17' && steps.setup-java-temurin-17.outputs.cache-hit == 'false'
-        run: sbt reload +update
+        run: sbt +update
 
       - uses: actions/setup-node@v3
         with:
@@ -129,7 +129,7 @@ jobs:
 
       - name: sbt update
         if: matrix.java == 'temurin@17' && steps.setup-java-temurin-17.outputs.cache-hit == 'false'
-        run: sbt reload +update
+        run: sbt +update
 
       - name: Download target directories (3)
         uses: actions/download-artifact@v3
