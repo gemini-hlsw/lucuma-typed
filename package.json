@@ -5,6 +5,6 @@
     "@types/react-datepicker": "^4.15.0",
     "highcharts": "^11.1.0",
     "primereact": "^9.6.2",
-    "typescript": "^5.1.6"
+    "typescript": "^5.2.2"
   }
 }
