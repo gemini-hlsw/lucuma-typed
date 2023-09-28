@@ -73,6 +73,9 @@ ThisBuild / scalacOptions += "-language:implicitConversions"
 lazy val root = project
   .in(file("."))
   .enablePlugins(NoPublishPlugin)
+  .settings(
+    githubWorkflowArtifactUpload := true // sources are generated here
+  )
   .aggregate(
     std,
     csstype,
