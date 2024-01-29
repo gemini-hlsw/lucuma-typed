@@ -11,10 +11,10 @@ ThisBuild / githubWorkflowTargetBranches += "!dependabot/**"
 ThisBuild / githubWorkflowBuildPreamble ++= Seq(
   WorkflowStep.Use(
     UseRef.Public("actions", "setup-node", "v3"),
-    params = Map("node-version" -> "18", "cache" -> "npm")
+    params = Map("node-version" -> "20", "cache" -> "npm")
   ),
   WorkflowStep.Run(
-    List("npm install")
+    List("npm ci")
   )
 )
 
@@ -192,7 +192,7 @@ lazy val reactDatepicker = project
     name := "lucuma-typed-react-datepicker"
   )
   .settings(facadeSettings("react-datepicker"))
-  .dependsOn(reactPopper, dateFns)
+  .dependsOn(react, reactPopper, dateFns)
   .enablePlugins(ScalaJSPlugin)
 
 lazy val tanstackTableCore = project
