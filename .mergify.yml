@@ -32,6 +32,46 @@ pull_request_rules:
       add:
       - dateFns
       remove: []
+- name: Label floatingUICore PRs
+  conditions:
+  - files~=^floatingUICore/
+  actions:
+    label:
+      add:
+      - floatingUICore
+      remove: []
+- name: Label floatingUIDom PRs
+  conditions:
+  - files~=^floatingUIDom/
+  actions:
+    label:
+      add:
+      - floatingUIDom
+      remove: []
+- name: Label floatingUIReact PRs
+  conditions:
+  - files~=^floatingUIReact/
+  actions:
+    label:
+      add:
+      - floatingUIReact
+      remove: []
+- name: Label floatingUIReactDom PRs
+  conditions:
+  - files~=^floatingUIReactDom/
+  actions:
+    label:
+      add:
+      - floatingUIReactDom
+      remove: []
+- name: Label floatingUIUtils PRs
+  conditions:
+  - files~=^floatingUIUtils/
+  actions:
+    label:
+      add:
+      - floatingUIUtils
+      remove: []
 - name: Label highcharts PRs
   conditions:
   - files~=^highcharts/
@@ -71,14 +111,6 @@ pull_request_rules:
     label:
       add:
       - reactDatepicker
-      remove: []
-- name: Label reactPopper PRs
-  conditions:
-  - files~=^reactPopper/
-  actions:
-    label:
-      add:
-      - reactPopper
       remove: []
 - name: Label reactTransitionGroup PRs
   conditions:
