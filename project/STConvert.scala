@@ -71,7 +71,7 @@ object STConvert {
     includeDev:     Boolean,
     includeProject: Boolean
   ) {
-    lazy val paths = new Paths(inDirectory)
+    lazy val paths                                               = new Paths(inDirectory)
     def mapConversion(f: ConversionOptions => ConversionOptions) = copy(conversion = f(conversion))
   }
 
