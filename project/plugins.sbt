@@ -5,4 +5,4 @@ libraryDependencies ++= Seq(
 )
 
 dependencyOverrides += "org.typelevel"          %% "cats-effect" % "2.1.4"
-dependencyOverrides += "org.scala-lang.modules" %% "scala-xml"   % "2.1.0"
+dependencyOverrides += "org.scala-lang.modules" %% "scala-xml"   % "2.3.0"
