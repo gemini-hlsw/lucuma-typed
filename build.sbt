@@ -108,7 +108,7 @@ lazy val std = project
   .settings(
     name := "lucuma-typed-std",
     libraryDependencies ++= Seq(
-      "com.github.japgolly.scalajs-react" %%% "core"                  % "3.0.0-beta6",
+      "com.github.japgolly.scalajs-react" %%% "core"                  % "3.0.0-beta7",
       "com.olvind"                        %%% "scalablytyped-runtime" % "2.4.2"
     )
   )
