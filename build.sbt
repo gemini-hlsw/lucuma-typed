@@ -1,6 +1,6 @@
-val scala3 = "3.4.2"
+val scala3 = "3.6.3"
 
-ThisBuild / tlBaseVersion      := "0.6"
+ThisBuild / tlBaseVersion      := "0.8"
 ThisBuild / crossScalaVersions := Seq(scala3)
 
 ThisBuild / tlCiReleaseBranches                := Seq("main")
@@ -112,7 +112,7 @@ lazy val std = project
   .settings(
     name := "lucuma-typed-std",
     libraryDependencies ++= Seq(
-      "com.github.japgolly.scalajs-react" %%% "core"                  % "3.0.0-beta3",
+      "com.github.japgolly.scalajs-react" %%% "core"                  % "3.0.0-beta10",
       "com.olvind"                        %%% "scalablytyped-runtime" % "2.4.2"
     )
   )
