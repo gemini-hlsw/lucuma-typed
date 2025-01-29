@@ -86,7 +86,11 @@ lazy val root = project
     react,
     reactTransitionGroup,
     primereact,
-    reactPopper,
+    floatingUIUtils,
+    floatingUICore,
+    floatingUIDom,
+    floatingUIReactDom,
+    floatingUIReact,
     reactDatepicker,
     tanstackTableCore,
     tanstackReactTable,
@@ -179,12 +183,44 @@ lazy val primereact = project
   .dependsOn(reactTransitionGroup)
   .enablePlugins(ScalaJSPlugin)
 
-lazy val reactPopper = project
+lazy val floatingUIUtils = project
   .settings(
-    name := "lucuma-typed-react-popper"
+    name := "lucuma-typed-floatingui-utils"
   )
-  .settings(facadeSettings("react-popper"))
-  .dependsOn(react)
+  .settings(facadeSettings("@floating-ui/utils"))
+  .dependsOn(std)
+  .enablePlugins(ScalaJSPlugin)
+
+lazy val floatingUICore = project
+  .settings(
+    name := "lucuma-typed-floatingui-core"
+  )
+  .settings(facadeSettings("@floating-ui/core"))
+  .dependsOn(floatingUIUtils)
+  .enablePlugins(ScalaJSPlugin)
+
+lazy val floatingUIDom = project
+  .settings(
+    name := "lucuma-typed-floatingui-dom"
+  )
+  .settings(facadeSettings("@floating-ui/dom"))
+  .dependsOn(floatingUICore)
+  .enablePlugins(ScalaJSPlugin)
+
+lazy val floatingUIReactDom = project
+  .settings(
+    name := "lucuma-typed-floatingui-react-dom"
+  )
+  .settings(facadeSettings("@floating-ui/react-dom"))
+  .dependsOn(react, floatingUIDom)
+  .enablePlugins(ScalaJSPlugin)
+
+lazy val floatingUIReact = project
+  .settings(
+    name := "lucuma-typed-floatingui-react"
+  )
+  .settings(facadeSettings("@floating-ui/react"))
+  .dependsOn(floatingUIReactDom)
   .enablePlugins(ScalaJSPlugin)
 
 lazy val reactDatepicker = project
@@ -192,7 +228,7 @@ lazy val reactDatepicker = project
     name := "lucuma-typed-react-datepicker"
   )
   .settings(facadeSettings("react-datepicker"))
-  .dependsOn(react, reactPopper, dateFns)
+  .dependsOn(react, floatingUIReact, dateFns)
   .enablePlugins(ScalaJSPlugin)
 
 lazy val tanstackTableCore = project
