@@ -4,7 +4,7 @@
     "@tanstack/react-virtual": "^3.11.3",
     "highcharts": "^11.4.1",
     "primereact": "^10.9.2",
-    "react-datepicker": "^7.6.0",
+    "react-datepicker": "^8.0.0",
     "typescript": "^5.7.3"
   }
 }
