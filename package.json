@@ -2,7 +2,7 @@
   "dependencies": {
     "@tanstack/react-table": "^8.21.2",
     "@tanstack/react-virtual": "^3.13.2",
-    "highcharts": "^11.4.1",
+    "highcharts": "^12.1.2",
     "primereact": "^10.9.2",
     "react-datepicker": "^8.1.0",
     "typescript": "^5.7.3"
