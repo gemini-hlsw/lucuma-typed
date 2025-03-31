@@ -3,7 +3,7 @@
     "@tanstack/react-table": "^8.21.2",
     "@tanstack/react-virtual": "^3.13.6",
     "highcharts": "^11.4.1",
-    "primereact": "^10.9.3",
+    "primereact": "^10.9.4",
     "react-datepicker": "^8.2.1",
     "typescript": "^5.8.2"
   }
