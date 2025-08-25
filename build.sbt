@@ -1,4 +1,10 @@
+import scala.sys.process.*
+
 val scala3 = "3.6.4"
+
+val ScalablyTypedCliVersion     = "1.0.0-beta44"
+val ScalablyTypedRuntimeVersion = "2.4.2"
+val ScalaJSReactVersion         = "3.0.0-beta12"
 
 ThisBuild / tlBaseVersion      := "0.8"
 ThisBuild / crossScalaVersions := Seq(scala3)
@@ -17,6 +23,12 @@ ThisBuild / githubWorkflowBuildPreamble ++= Seq(
     List("npm ci")
   )
 )
+
+ThisBuild / githubWorkflowBuildPreamble +=
+  WorkflowStep.Use(
+    UseRef.Public("VirtusLab", "scala-cli-setup", "v1.5"),
+    name = Some("Setup scala-cli")
+  )
 
 ThisBuild / githubWorkflowBuild ~= { steps =>
   WorkflowStep.Sbt(List("lucumaTypedGenerate")) +: steps
@@ -42,8 +54,8 @@ lazy val stOut = Def.setting { (npm: String) =>
 
 lazy val lucumaTypedGenerate = taskKey[Unit]("Generate the ST facades")
 lucumaTypedGenerate := {
-  STConvert.main(
-    Array(
+  val convertArgs =
+    List(
       "--outputPackage",
       "lucuma.typed",
       "-f",
@@ -52,8 +64,9 @@ lucumaTypedGenerate := {
       scala3,
       "--scalajs",
       scalaJSVersion
-    )
-  )
+    ).mkString(" ")
+
+  s"scala-cli --scala 2.12.18 --dependency org.scalablytyped.converter::cli:${ScalablyTypedCliVersion} STConvert/STConvert.scala -- $convertArgs" !
 
   stOut.value("primereact").foreach { f =>
     val content     = IO.read(f)
@@ -86,12 +99,6 @@ lazy val root = project
     react,
     reactTransitionGroup,
     primereact,
-    floatingUIUtils,
-    floatingUICore,
-    floatingUIDom,
-    floatingUIReactDom,
-    floatingUIReact,
-    reactDatepicker,
     tanstackTableCore,
     tanstackReactTable,
     tanstackVirtualCore,
@@ -112,8 +119,8 @@ lazy val std = project
   .settings(
     name := "lucuma-typed-std",
     libraryDependencies ++= Seq(
-      "com.github.japgolly.scalajs-react" %%% "core"                  % "3.0.0-beta10",
-      "com.olvind"                        %%% "scalablytyped-runtime" % "2.4.2"
+      "com.github.japgolly.scalajs-react" %%% "core"                  % ScalaJSReactVersion,
+      "com.olvind"                        %%% "scalablytyped-runtime" % ScalablyTypedRuntimeVersion
     )
   )
   .settings(facadeSettings("std"))
@@ -181,54 +188,6 @@ lazy val primereact = project
   )
   .settings(facadeSettings("primereact"))
   .dependsOn(reactTransitionGroup)
-  .enablePlugins(ScalaJSPlugin)
-
-lazy val floatingUIUtils = project
-  .settings(
-    name := "lucuma-typed-floatingui-utils"
-  )
-  .settings(facadeSettings("@floating-ui/utils"))
-  .dependsOn(std)
-  .enablePlugins(ScalaJSPlugin)
-
-lazy val floatingUICore = project
-  .settings(
-    name := "lucuma-typed-floatingui-core"
-  )
-  .settings(facadeSettings("@floating-ui/core"))
-  .dependsOn(floatingUIUtils)
-  .enablePlugins(ScalaJSPlugin)
-
-lazy val floatingUIDom = project
-  .settings(
-    name := "lucuma-typed-floatingui-dom"
-  )
-  .settings(facadeSettings("@floating-ui/dom"))
-  .dependsOn(floatingUICore)
-  .enablePlugins(ScalaJSPlugin)
-
-lazy val floatingUIReactDom = project
-  .settings(
-    name := "lucuma-typed-floatingui-react-dom"
-  )
-  .settings(facadeSettings("@floating-ui/react-dom"))
-  .dependsOn(react, floatingUIDom)
-  .enablePlugins(ScalaJSPlugin)
-
-lazy val floatingUIReact = project
-  .settings(
-    name := "lucuma-typed-floatingui-react"
-  )
-  .settings(facadeSettings("@floating-ui/react"))
-  .dependsOn(floatingUIReactDom)
-  .enablePlugins(ScalaJSPlugin)
-
-lazy val reactDatepicker = project
-  .settings(
-    name := "lucuma-typed-react-datepicker"
-  )
-  .settings(facadeSettings("react-datepicker"))
-  .dependsOn(react, floatingUIReact, dateFns)
   .enablePlugins(ScalaJSPlugin)
 
 lazy val tanstackTableCore = project

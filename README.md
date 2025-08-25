@@ -6,4 +6,6 @@ We use the ST CLI interface, rather than the sbt plugin, to generate the sources
 
 To invoke the generator run `lucumaTypedGenerate`. This takes several minutes :)
 
+Note that ST caches some stuff in ~/.ivy2/local/org.scalablytyped. If you are trying to debug the conversion locally, delete this directory between runs or a previous success may disguise what would be a new failure.
+
 To add a new facade, first add it to the `package.json` and `npm install`. Then in `build.sbt` you should setup sbt subprojects for that facade and all of its (new) transitive dependencies. Some of its transitives (such as `std`) will already be in the build. Additionally, you should wire up the `.dependsOn` relationships between all these new projects, and add them to the root aggregate.

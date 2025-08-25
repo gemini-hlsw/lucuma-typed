@@ -5,3 +5,4 @@ target/
 .bsp/
 .direnv/
 metals.sbt
+.scala-build/
