@@ -61,6 +61,9 @@ jobs:
 
       - run: npm ci
 
+      - name: Setup scala-cli
+        uses: VirtusLab/scala-cli-setup@v1.5
+
       - name: Check that workflows are up to date
         run: sbt githubWorkflowCheck
 
@@ -93,11 +96,11 @@ jobs:
 
       - name: Make target directories
         if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main')
-        run: mkdir -p dateFns/target primereact/target floatingUICore/target propTypes/target highcharts/target reactTransitionGroup/target csstype/target tanstackTableCore/target target tanstackVirtualCore/target floatingUIDom/target react/target floatingUIReact/target std/target tanstackReactVirtual/target scheduler/target reactDatepicker/target floatingUIReactDom/target floatingUIUtils/target tanstackReactTable/target project/target
+        run: mkdir -p dateFns/target primereact/target propTypes/target highcharts/target reactTransitionGroup/target csstype/target tanstackTableCore/target target tanstackVirtualCore/target react/target std/target tanstackReactVirtual/target scheduler/target tanstackReactTable/target project/target
 
       - name: Compress target directories
         if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main')
-        run: tar cf targets.tar dateFns/target primereact/target floatingUICore/target propTypes/target highcharts/target reactTransitionGroup/target csstype/target tanstackTableCore/target target tanstackVirtualCore/target floatingUIDom/target react/target floatingUIReact/target std/target tanstackReactVirtual/target scheduler/target reactDatepicker/target floatingUIReactDom/target floatingUIUtils/target tanstackReactTable/target project/target
+        run: tar cf targets.tar dateFns/target primereact/target propTypes/target highcharts/target reactTransitionGroup/target csstype/target tanstackTableCore/target target tanstackVirtualCore/target react/target std/target tanstackReactVirtual/target scheduler/target tanstackReactTable/target project/target
 
       - name: Upload target directories
         if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main')
