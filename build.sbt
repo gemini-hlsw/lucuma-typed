@@ -83,6 +83,10 @@ lucumaTypedGenerate := {
 ThisBuild / tlFatalWarnings := false
 ThisBuild / scalacOptions += "-language:implicitConversions"
 
+// Suppress compiler warnings. This is all generated code and there are thousands of
+// "unused" warnings, etc. You may want to comment this out to troubleshoot the ST conversion.
+ThisBuild / scalacOptions += "-Wconf:any:silent"
+
 lazy val root = project
   .in(file("."))
   .enablePlugins(NoPublishPlugin)
