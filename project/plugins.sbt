@@ -1,4 +1,4 @@
-addSbtPlugin("edu.gemini" % "sbt-lucuma-lib" % "0.13.1")
+addSbtPlugin("edu.gemini" % "sbt-lucuma-lib" % "0.14.7")
 
 dependencyOverrides += "org.typelevel"          %% "cats-effect" % "2.5.5"
 dependencyOverrides += "org.scala-lang.modules" %% "scala-xml"   % "2.4.0"
