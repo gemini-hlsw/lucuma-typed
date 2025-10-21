@@ -4,7 +4,7 @@ val scala3 = "3.6.4"
 
 val ScalablyTypedCliVersion     = "1.0.0-beta44"
 val ScalablyTypedRuntimeVersion = "2.4.2"
-val ScalaJSReactVersion         = "3.0.0-beta12"
+val ScalaJSReactVersion         = "3.0.0-beta13"
 
 ThisBuild / tlBaseVersion      := "0.8"
 ThisBuild / crossScalaVersions := Seq(scala3)
