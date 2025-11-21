@@ -1,0 +1,8 @@
+package.json
+highcharts.*
+modules/accessibility.*
+modules/series-label.*
+options/area.*
+options/areaspline.*
+options/line.*
+options/series.*
