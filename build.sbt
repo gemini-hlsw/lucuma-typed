@@ -6,7 +6,7 @@ val ScalablyTypedCliVersion     = "1.0.0-beta44"
 val ScalablyTypedRuntimeVersion = "2.4.2"
 val ScalaJSReactVersion         = "3.0.0-beta12"
 
-ThisBuild / tlBaseVersion      := "0.8"
+ThisBuild / tlBaseVersion      := "0.9"
 ThisBuild / crossScalaVersions := Seq(scala3)
 
 ThisBuild / tlCiReleaseBranches                := Seq("main")
@@ -23,6 +23,20 @@ ThisBuild / githubWorkflowBuildPreamble ++= Seq(
     List("npm ci")
   )
 )
+
+lazy val reportHeap = taskKey[Unit]("Report JVM heap usage (max/total/used/free in MB)")
+
+reportHeap := {
+  val rt                  = java.lang.Runtime.getRuntime
+  def mb(n: Long): Double = n.toDouble / 1024.0 / 1024.0
+  val max                 = mb(rt.maxMemory)
+  val total               = mb(rt.totalMemory)
+  val free                = mb(rt.freeMemory)
+  val used                = total - free
+
+  val fmt = f"JVM heap (MB): max=${max}%.1f total=${total}%.1f used=${used}%.1f free=${free}%.1f"
+  streams.value.log.info(fmt)
+}
 
 ThisBuild / githubWorkflowBuildPreamble +=
   WorkflowStep.Use(
@@ -52,8 +66,20 @@ lazy val stOut = Def.setting { (npm: String) =>
   finder.get
 }
 
+def fixFileContent(f: File, fix: String => String): Unit = {
+  val content     = IO.read(f)
+  val transformed = fix(content)
+  if (transformed != content)
+    IO.write(f, transformed)
+}
+
 lazy val lucumaTypedGenerate = taskKey[Unit]("Generate the ST facades")
 lucumaTypedGenerate := {
+  // Prune unused files from highcharts
+  "./prune-files.js node_modules/highcharts highcharts-kept-files.txt" !
+
+  "./prune-types.js --types-file highcharts-removed-types.txt node_modules/highcharts/highcharts.src.d.ts" !
+
   val convertArgs =
     List(
       "--outputPackage",
@@ -68,15 +94,15 @@ lucumaTypedGenerate := {
 
   s"scala-cli --scala 2.12.18 --dependency org.scalablytyped.converter::cli:${ScalablyTypedCliVersion} STConvert/STConvert.scala -- $convertArgs" !
 
+  // use the ESM-style sources in imports
   stOut.value("primereact").foreach { f =>
-    val content     = IO.read(f)
-    // use the ESM-style sources in imports
-    val transformed = content.replaceAll(
-      """@JSImport\("primereact\/((.+?)(?<!\.esm))",""",
-      """@JSImport("primereact/$1.esm","""
+    fixFileContent(
+      f,
+      _.replaceAll(
+        """@JSImport\("primereact\/((.+?)(?<!\.esm))",""",
+        """@JSImport("primereact/$1.esm","""
+      )
     )
-    if (transformed != content)
-      IO.write(f, transformed)
   }
 }
 
@@ -86,6 +112,8 @@ ThisBuild / scalacOptions += "-language:implicitConversions"
 // Suppress compiler warnings. This is all generated code and there are thousands of
 // "unused" warnings, etc. You may want to comment this out to troubleshoot the ST conversion.
 ThisBuild / scalacOptions += "-Wconf:any:silent"
+
+ThisBuild / scalacOptions += "-Xno-enrich-error-messages"
 
 lazy val root = project
   .in(file("."))

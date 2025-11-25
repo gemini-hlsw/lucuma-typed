@@ -4,6 +4,8 @@ A repository of Scalably Typed generated facades, and nothing more. The sources 
 
 We use the ST CLI interface, rather than the sbt plugin, to generate the sources. This is so that each target npm package can be published as a separate sbt module while still sharing common dependencies with others.
 
+For big libraries, namely `highcharts`, we prune its interface to keep just the parts we use and thus keep the generated code manageable.
+
 To invoke the generator run `lucumaTypedGenerate`. This takes several minutes :)
 
 Note that ST caches some stuff in ~/.ivy2/local/org.scalablytyped. If you are trying to debug the conversion locally, delete this directory between runs or a previous success may disguise what would be a new failure.
