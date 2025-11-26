@@ -9,6 +9,6 @@
   "devDependencies": {
     "glob": "^13.0.0",
     "minimatch": "^10.1.1",
-    "ts-morph": "^23.0.0"
+    "ts-morph": "^27.0.2"
   }
 }
