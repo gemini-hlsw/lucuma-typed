@@ -7,7 +7,7 @@
     "typescript": "^5.9.3"
   },
   "devDependencies": {
-    "glob": "^10.3.10",
+    "glob": "^13.0.0",
     "minimatch": "^10.1.1",
     "ts-morph": "^23.0.0"
   }
