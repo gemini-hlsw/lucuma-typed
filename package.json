@@ -8,7 +8,7 @@
   },
   "devDependencies": {
     "glob": "^13.0.3",
-    "minimatch": "^10.2.0",
+    "minimatch": "^10.2.1",
     "ts-morph": "^27.0.2"
   }
 }
