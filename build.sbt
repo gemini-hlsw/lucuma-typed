@@ -1,6 +1,6 @@
 import scala.sys.process.*
 
-val scala3 = "3.8.1"
+val scala3 = "3.8.2"
 
 val ScalablyTypedCliVersion     = "1.0.0-beta44"
 val ScalablyTypedRuntimeVersion = "2.4.2"
