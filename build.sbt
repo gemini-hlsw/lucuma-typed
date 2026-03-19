@@ -76,9 +76,9 @@ def fixFileContent(f: File, fix: String => String): Unit = {
 lazy val lucumaTypedGenerate = taskKey[Unit]("Generate the ST facades")
 lucumaTypedGenerate := {
   // Prune unused files from highcharts
-  "./prune-files.js node_modules/highcharts highcharts-kept-files.txt" !
+  "./prune-files.js node_modules/highcharts highcharts-kept-files.txt" !!
 
-  "./prune-types.js --types-file highcharts-removed-types.txt node_modules/highcharts/highcharts.src.d.ts" !
+  "./prune-types.js --types-file highcharts-removed-types.txt node_modules/highcharts/highcharts.src.d.ts" !!
 
   val convertArgs =
     List(
@@ -92,7 +92,7 @@ lucumaTypedGenerate := {
       scalaJSVersion
     ).mkString(" ")
 
-  s"scala-cli --scala 2.12.18 --dependency org.scalablytyped.converter::cli:${ScalablyTypedCliVersion} STConvert/STConvert.scala -- $convertArgs" !
+  s"scala-cli --scala 2.12.18 --dependency org.scalablytyped.converter::cli:${ScalablyTypedCliVersion} STConvert/STConvert.scala -- $convertArgs" !!
 
   // use the ESM-style sources in imports
   stOut.value("primereact").foreach { f =>
