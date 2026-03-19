@@ -1,6 +1,6 @@
 import scala.sys.process.*
 
-val scala3 = "3.8.2"
+val scala3 = "3.3.7"
 
 val ScalablyTypedCliVersion     = "1.0.0-beta44"
 val ScalablyTypedRuntimeVersion = "2.4.2"
@@ -16,8 +16,8 @@ ThisBuild / githubWorkflowArtifactUpload       := true
 ThisBuild / githubWorkflowTargetBranches += "!dependabot/**"
 ThisBuild / githubWorkflowBuildPreamble ++= Seq(
   WorkflowStep.Use(
-    UseRef.Public("actions", "setup-node", "v3"),
-    params = Map("node-version" -> "20", "cache" -> "npm")
+    UseRef.Public("actions", "setup-node", "v4"),
+    params = Map("node-version" -> "24", "cache" -> "npm")
   ),
   WorkflowStep.Run(
     List("npm ci")
@@ -40,12 +40,15 @@ reportHeap := {
 
 ThisBuild / githubWorkflowBuildPreamble +=
   WorkflowStep.Use(
-    UseRef.Public("VirtusLab", "scala-cli-setup", "v1.5"),
+    UseRef.Public("VirtusLab", "scala-cli-setup", "v1"),
     name = Some("Setup scala-cli")
   )
 
 ThisBuild / githubWorkflowBuild ~= { steps =>
-  WorkflowStep.Sbt(List("lucumaTypedGenerate")) +: steps
+  WorkflowStep.Sbt(
+    List("lucumaTypedGenerate"),
+    env = Map("NODE_OPTIONS" -> "--max-old-space-size=8192")
+  ) +: steps
 }
 
 ThisBuild / mergifyPrRules +=
@@ -76,9 +79,9 @@ def fixFileContent(f: File, fix: String => String): Unit = {
 lazy val lucumaTypedGenerate = taskKey[Unit]("Generate the ST facades")
 lucumaTypedGenerate := {
   // Prune unused files from highcharts
-  "./prune-files.js node_modules/highcharts highcharts-kept-files.txt" !
+  "./prune-files.js node_modules/highcharts highcharts-kept-files.txt" !!
 
-  "./prune-types.js --types-file highcharts-removed-types.txt node_modules/highcharts/highcharts.src.d.ts" !
+  "./prune-types.js --types-file highcharts-removed-types.txt node_modules/highcharts/highcharts.src.d.ts" !!
 
   val convertArgs =
     List(
@@ -92,7 +95,7 @@ lucumaTypedGenerate := {
       scalaJSVersion
     ).mkString(" ")
 
-  s"scala-cli --scala 2.12.18 --dependency org.scalablytyped.converter::cli:${ScalablyTypedCliVersion} STConvert/STConvert.scala -- $convertArgs" !
+  s"scala-cli --scala 2.12.18 --dependency org.scalablytyped.converter::cli:${ScalablyTypedCliVersion} STConvert/STConvert.scala -- $convertArgs" !!
 
   // use the ESM-style sources in imports
   stOut.value("primereact").foreach { f =>
