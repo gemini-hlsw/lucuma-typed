@@ -97,14 +97,33 @@ lucumaTypedGenerate := {
 
   s"scala-cli --scala 2.12.18 --dependency org.scalablytyped.converter::cli:${ScalablyTypedCliVersion} STConvert/STConvert.scala -- $convertArgs" !!
 
+  val out = stOut.value
   // use the ESM-style sources in imports
-  stOut.value("primereact").foreach { f =>
+  out("primereact").foreach { f =>
     fixFileContent(
       f,
       _.replaceAll(
         """@JSImport\("primereact\/((.+?)(?<!\.esm))",""",
         """@JSImport("primereact/$1.esm","""
       )
+    )
+  }
+
+  // rewrite highcharts imports to use ESM-style sources
+  out("highcharts").foreach { f =>
+    fixFileContent(
+      f,
+      _
+        // @JSImport("highcharts/modules/foo") -> @JSImport("highcharts/esm/modules/foo.js")
+        .replaceAll(
+          """@JSImport\("highcharts\/modules\/([^"]+)",""",
+          """@JSImport("highcharts/esm/modules/$1.js","""
+        )
+        // @JSImport("highcharts") -> @JSImport("highcharts/esm/highcharts.js")
+        .replaceAll(
+          """@JSImport\("highcharts",""",
+          """@JSImport("highcharts/esm/highcharts.js","""
+        )
     )
   }
 }
