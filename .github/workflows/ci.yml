@@ -54,20 +54,22 @@ jobs:
         if: matrix.java == 'temurin@17' && steps.setup-java-temurin-17.outputs.cache-hit == 'false'
         run: sbt +update
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
           cache: npm
 
       - run: npm ci
 
       - name: Setup scala-cli
-        uses: VirtusLab/scala-cli-setup@v1.5
+        uses: VirtusLab/scala-cli-setup@v1
 
       - name: Check that workflows are up to date
         run: sbt githubWorkflowCheck
 
-      - run: sbt lucumaTypedGenerate
+      - env:
+          NODE_OPTIONS: '--max-old-space-size=8192'
+        run: sbt lucumaTypedGenerate
 
       - name: Check headers and formatting
         if: matrix.java == 'temurin@17' && matrix.os == 'ubuntu-22.04'

@@ -16,8 +16,8 @@ ThisBuild / githubWorkflowArtifactUpload       := true
 ThisBuild / githubWorkflowTargetBranches += "!dependabot/**"
 ThisBuild / githubWorkflowBuildPreamble ++= Seq(
   WorkflowStep.Use(
-    UseRef.Public("actions", "setup-node", "v3"),
-    params = Map("node-version" -> "20", "cache" -> "npm")
+    UseRef.Public("actions", "setup-node", "v4"),
+    params = Map("node-version" -> "24", "cache" -> "npm")
   ),
   WorkflowStep.Run(
     List("npm ci")
@@ -40,12 +40,15 @@ reportHeap := {
 
 ThisBuild / githubWorkflowBuildPreamble +=
   WorkflowStep.Use(
-    UseRef.Public("VirtusLab", "scala-cli-setup", "v1.5"),
+    UseRef.Public("VirtusLab", "scala-cli-setup", "v1"),
     name = Some("Setup scala-cli")
   )
 
 ThisBuild / githubWorkflowBuild ~= { steps =>
-  WorkflowStep.Sbt(List("lucumaTypedGenerate")) +: steps
+  WorkflowStep.Sbt(
+    List("lucumaTypedGenerate"),
+    env = Map("NODE_OPTIONS" -> "--max-old-space-size=8192")
+  ) +: steps
 }
 
 ThisBuild / mergifyPrRules +=
