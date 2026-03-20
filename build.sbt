@@ -128,10 +128,10 @@ lucumaTypedGenerate := {
           """@JSImport\("highcharts\/modules\/([^"]+)",""",
           """@JSImport("highcharts/esm/modules/$1.js","""
         )
-        // @JSImport("highcharts") -> @JSImport("highcharts/esm/highcharts.js")
+        // @JSImport("highcharts", JSImport.Namespace) -> @JSImport("highcharts/esm/highcharts.js", JSImport.Default)
         .replaceAll(
-          """@JSImport\("highcharts",""",
-          """@JSImport("highcharts/esm/highcharts.js","""
+          """@JSImport\("highcharts", JSImport\.Namespace\)""",
+          """@JSImport("highcharts/esm/highcharts.js", JSImport.Default)"""
         )
     )
   }
