@@ -15,11 +15,11 @@
 
 import com.olvind.logging.{LogLevel, Logger, stdout, storing}
 import fansi.{Attr, Color, Str}
-import org.scalablytyped.converter.internal.importer._
+import org.scalablytyped.converter.internal.importer.*
 import org.scalablytyped.converter.internal.importer.build.{
-  BloopCompiler,
   PublishedSbtProject,
-  SbtProject
+  SbtProject,
+  ScalaCliCompiler
 }
 import org.scalablytyped.converter.internal.importer.documentation.Npmjs
 import org.scalablytyped.converter.internal.phases.PhaseListener.NoListener
@@ -41,9 +41,9 @@ import scala.util.{Failure, Success, Try}
 object STConvert {
   class Paths(base: os.Path) {
     lazy val out: os.Path             =
-      files.existing(base / 'target / "scalably-typed")
+      files.existing(base / "target" / "scalably-typed")
     val node_modules: Option[os.Path] =
-      Option(base / 'node_modules).filter(files.exists)
+      Option(base / "node_modules").filter(files.exists)
     val packageJson: Option[os.Path]  =
       Option(base / "package.json").filter(files.exists)
   }
@@ -83,7 +83,7 @@ object STConvert {
     includeProject = false
   )
 
-  val parseCachePath = Some(files.existing(constants.defaultCacheFolder / 'parse).toNIO)
+  val parseCachePath = Some(files.existing(constants.defaultCacheFolder / "parse").toNIO)
   val t0             = System.currentTimeMillis
 
   val logger: Logger[(Array[Logger.Stored], Unit)] =
@@ -104,7 +104,7 @@ object STConvert {
     Read.stringRead.map(TsIdentLibrary.apply)
 
   implicit val ReadsProjectName: Read[ProjectName] =
-    Read.stringRead.map(ProjectName)
+    Read.stringRead.map(ProjectName.apply)
 
   implicit val ReadsOsPath: Read[os.Path] =
     Read.stringRead.map { str =>
@@ -119,8 +119,8 @@ object STConvert {
     Read.reads {
       case "all"                  => Selection.All
       case "none"                 => Selection.All
-      case s if s.startsWith("+") => Selection.NoneExcept(ts.reads(s.drop(1)): _*)
-      case s if s.startsWith("-") => Selection.AllExcept(ts.reads(s.drop(1)): _*)
+      case s if s.startsWith("+") => Selection.NoneExcept(ts.reads(s.drop(1))*)
+      case s if s.startsWith("-") => Selection.AllExcept(ts.reads(s.drop(1))*)
       case _                      =>
         sys.error(
           "Syntax: `all`/`none` for Selection.All/Selection.None, `+a,b` for Selection.NoneExcept(a, b), `-a,b` for Selection.AllExcept(a, b)"
@@ -181,7 +181,7 @@ object STConvert {
         .action((x, c) => c.mapConversion(_.copy(privateWithin = Some(Name(x)))))
         .text(s"Libraries you want to ignore"),
       opt[Boolean]("experimentalEnableImplicitOps")
-        .action { (x, c) =>
+        .action { (_, c) =>
           logger.warn(
             "--experimentalEnableImplicitOps has no effect since it became the default encoding"
           )
@@ -277,10 +277,7 @@ object STConvert {
         )
 
         val compiler = Await.result(
-          BloopCompiler(logger.filter(LogLevel.debug).void,
-                        conversion.versions,
-                        failureCacheFolderOpt = None
-          ),
+          ScalaCliCompiler(logger.filter(LogLevel.debug).void, conversion.versions),
           Duration.Inf
         )
 

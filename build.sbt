@@ -2,11 +2,11 @@ import scala.sys.process.*
 
 val scala3 = "3.3.7"
 
-val ScalablyTypedCliVersion     = "1.0.0-beta44"
+val ScalablyTypedCliVersion     = "1.0.0-beta45"
 val ScalablyTypedRuntimeVersion = "2.4.2"
 val ScalaJSReactVersion         = "3.0.0"
 
-ThisBuild / tlBaseVersion      := "0.10"
+ThisBuild / tlBaseVersion      := "0.11"
 ThisBuild / crossScalaVersions := Seq(scala3)
 
 ThisBuild / tlCiReleaseBranches                := Seq("main")
@@ -79,9 +79,15 @@ def fixFileContent(f: File, fix: String => String): Unit = {
 lazy val lucumaTypedGenerate = taskKey[Unit]("Generate the ST facades")
 lucumaTypedGenerate := {
   // Prune unused files from highcharts
-  "./prune-files.js node_modules/highcharts highcharts-kept-files.txt" !!
+  "./prune-files.js node_modules/highcharts highcharts-kept-files.txt" ! match {
+    case 0    => // ok
+    case code => scala.sys.error("Nonzero exit value: " + code)
+  }
 
-  "./prune-types.js --types-file highcharts-removed-types.txt node_modules/highcharts/highcharts.src.d.ts" !!
+  "./prune-types.js --types-file highcharts-removed-types.txt node_modules/highcharts/highcharts.src.d.ts" ! match {
+    case 0    => // ok
+    case code => scala.sys.error("Nonzero exit value: " + code)
+  }
 
   val convertArgs =
     List(
@@ -95,7 +101,10 @@ lucumaTypedGenerate := {
       scalaJSVersion
     ).mkString(" ")
 
-  s"scala-cli --scala 2.12.18 --dependency org.scalablytyped.converter::cli:${ScalablyTypedCliVersion} STConvert/STConvert.scala -- $convertArgs" !!
+  s"scala-cli --scala $scala3 --dependency org.scalablytyped.converter::cli:${ScalablyTypedCliVersion} STConvert/STConvert.scala -- $convertArgs" ! match {
+    case 0    => // ok
+    case code => scala.sys.error("Nonzero exit value: " + code)
+  }
 
   val out = stOut.value
   // use the ESM-style sources in imports
