@@ -16,7 +16,7 @@ ThisBuild / githubWorkflowArtifactUpload       := true
 ThisBuild / githubWorkflowTargetBranches += "!dependabot/**"
 ThisBuild / githubWorkflowBuildPreamble ++= Seq(
   WorkflowStep.Use(
-    UseRef.Public("actions", "setup-node", "v4"),
+    UseRef.Public("actions", "setup-node", "v6"),
     params = Map("node-version" -> "24", "cache" -> "npm")
   ),
   WorkflowStep.Run(
