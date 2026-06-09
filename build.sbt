@@ -41,7 +41,10 @@ reportHeap := {
 ThisBuild / githubWorkflowBuildPreamble +=
   WorkflowStep.Use(
     UseRef.Public("VirtusLab", "scala-cli-setup", "v1"),
-    name = Some("Setup scala-cli")
+    name = Some("Setup scala-cli"),
+    params = Map(
+      "jvm" -> githubWorkflowJavaVersions.value.head.render.replace("@", ":")
+    )
   )
 
 ThisBuild / githubWorkflowBuild ~= { steps =>
