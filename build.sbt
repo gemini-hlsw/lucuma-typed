@@ -6,7 +6,7 @@ val ScalablyTypedCliVersion     = "1.0.0-beta45"
 val ScalablyTypedRuntimeVersion = "2.4.2"
 val ScalaJSReactVersion         = "4.0.0"
 
-ThisBuild / tlBaseVersion      := "0.11"
+ThisBuild / tlBaseVersion      := "0.12"
 ThisBuild / crossScalaVersions := Seq(scala3)
 
 ThisBuild / tlCiReleaseBranches                := Seq("main")
