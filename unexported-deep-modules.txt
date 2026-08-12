@@ -1,0 +1,12 @@
+# Deep module paths that remap-exports.js cannot fix, because the package exports the symbols
+# from no entry point at all — ScalablyTyped generated a facade over internals. Listing one here
+# means "we know, and no consumer should be touching it"; the import stays invalid under Node, so
+# reaching these objects from Scala still throws ERR_PACKAGE_PATH_NOT_EXPORTED.
+#
+# Anything NOT listed here is a hard generation failure, which is the point: a new occurrence has
+# to be looked at rather than silently shipped.
+
+# @tanstack/virtual-core keeps memo/debounce/approxEqual/notUndefined and the lazy-measurements
+# view internal. lucuma-react only consumes the public Virtualizer/Key/Range/Rect surface.
+@tanstack/virtual-core/dist/esm/utils
+@tanstack/virtual-core/dist/esm/lazy-measurements

@@ -6,7 +6,7 @@ val ScalablyTypedCliVersion     = "1.0.0-beta45"
 val ScalablyTypedRuntimeVersion = "2.4.2"
 val ScalaJSReactVersion         = "4.0.0"
 
-ThisBuild / tlBaseVersion      := "0.12"
+ThisBuild / tlBaseVersion      := "0.13"
 ThisBuild / crossScalaVersions := Seq(scala3)
 
 ThisBuild / tlCiReleaseBranches                := Seq("main")
@@ -92,6 +92,19 @@ lucumaTypedGenerate := {
     case code => scala.sys.error("Nonzero exit value: " + code)
   }
 
+  // The ST parser chokes on TS variance annotations, which table-core v9 uses heavily
+  "./strip-variance.js node_modules/@tanstack/table-core" ! match {
+    case 0    => // ok
+    case code => scala.sys.error("Nonzero exit value: " + code)
+  }
+
+  // The tanstack store packages only advertise .d.cts typings, which ST cannot find; without
+  // this it skips them and every Atom/Store reference in react-table degrades to js.Any
+  "./retarget-types.js @tanstack/store ./dist/index.d.ts @tanstack/react-store ./dist/index.d.ts" ! match {
+    case 0    => // ok
+    case code => scala.sys.error("Nonzero exit value: " + code)
+  }
+
   val convertArgs =
     List(
       "--outputPackage",
@@ -138,6 +151,24 @@ lucumaTypedGenerate := {
         )
     )
   }
+
+  // ST emits one @JSImport per TypeScript source file, which the tanstack packages' `exports`
+  // maps do not publish; point those at entry points that exist. All four share a directory.
+  val tanstackOut      = stBase.value("@tanstack/table-core").getParentFile
+  val tanstackPackages =
+    Seq(
+      "@tanstack/store",
+      "@tanstack/react-store",
+      "@tanstack/table-core",
+      "@tanstack/react-table",
+      "@tanstack/virtual-core",
+      "@tanstack/react-virtual"
+    )
+
+  s"./remap-exports.js --allowed unexported-deep-modules.txt $tanstackOut ${tanstackPackages.mkString(" ")}" ! match {
+    case 0    => // ok
+    case code => scala.sys.error("Nonzero exit value: " + code)
+  }
 }
 
 ThisBuild / tlFatalWarnings := false
@@ -165,6 +196,8 @@ lazy val root = project
     react,
     reactTransitionGroup,
     primereact,
+    tanstackStore,
+    tanstackReactStore,
     tanstackTableCore,
     tanstackReactTable,
     tanstackVirtualCore,
@@ -256,12 +289,28 @@ lazy val primereact = project
   .dependsOn(reactTransitionGroup)
   .enablePlugins(ScalaJSPlugin)
 
+lazy val tanstackStore = project
+  .settings(
+    name := "lucuma-typed-tanstack-store"
+  )
+  .settings(facadeSettings("@tanstack/store"))
+  .dependsOn(std)
+  .enablePlugins(ScalaJSPlugin)
+
+lazy val tanstackReactStore = project
+  .settings(
+    name := "lucuma-typed-tanstack-react-store"
+  )
+  .settings(facadeSettings("@tanstack/react-store"))
+  .dependsOn(react, tanstackStore)
+  .enablePlugins(ScalaJSPlugin)
+
 lazy val tanstackTableCore = project
   .settings(
     name := "lucuma-typed-tanstack-table-core"
   )
   .settings(facadeSettings("@tanstack/table-core"))
-  .dependsOn(std)
+  .dependsOn(std, tanstackStore)
   .enablePlugins(ScalaJSPlugin)
 
 lazy val tanstackReactTable = project
@@ -269,7 +318,7 @@ lazy val tanstackReactTable = project
     name := "lucuma-typed-tanstack-react-table"
   )
   .settings(facadeSettings("@tanstack/react-table"))
-  .dependsOn(react, tanstackTableCore)
+  .dependsOn(react, tanstackTableCore, tanstackReactStore)
   .enablePlugins(ScalaJSPlugin)
 
 lazy val tanstackVirtualCore = project
