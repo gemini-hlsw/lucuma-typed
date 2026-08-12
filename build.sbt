@@ -154,7 +154,7 @@ lucumaTypedGenerate := {
 
   // ST emits one @JSImport per TypeScript source file, which the tanstack packages' `exports`
   // maps do not publish; point those at entry points that exist. All four share a directory.
-  val tanstackOut = stBase.value("@tanstack/table-core").getParentFile
+  val tanstackOut      = stBase.value("@tanstack/table-core").getParentFile
   val tanstackPackages =
     Seq(
       "@tanstack/store",
