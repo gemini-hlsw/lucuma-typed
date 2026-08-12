@@ -88,6 +88,14 @@ pull_request_rules:
       add:
       - std
       remove: []
+- name: Label tanstackReactStore PRs
+  conditions:
+  - files~=^tanstackReactStore/
+  actions:
+    label:
+      add:
+      - tanstackReactStore
+      remove: []
 - name: Label tanstackReactTable PRs
   conditions:
   - files~=^tanstackReactTable/
@@ -103,6 +111,14 @@ pull_request_rules:
     label:
       add:
       - tanstackReactVirtual
+      remove: []
+- name: Label tanstackStore PRs
+  conditions:
+  - files~=^tanstackStore/
+  actions:
+    label:
+      add:
+      - tanstackStore
       remove: []
 - name: Label tanstackTableCore PRs
   conditions:
