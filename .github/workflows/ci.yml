@@ -16,6 +16,8 @@ on:
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  SBT_OPTS: '-Dlmcoursier.internal.shaded.coursier.exception-retry=10'
+  LUCUMA_AFFECTED_DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
 
 
 concurrency:
@@ -49,10 +51,21 @@ jobs:
           distribution: temurin
           java-version: 25
           cache: sbt
+          cache-dependency-path: |
+            **/*.sbt
+            **/project/build.properties
+            **/project/**.scala
+            **/project/**.sbt
+            .github/workflows/ci.yml
 
       - name: sbt update
         if: matrix.java == 'temurin@25' && steps.setup-java-temurin-25.outputs.cache-hit == 'false'
-        run: sbt +update
+        run: |
+          for attempt in 1 2 3; do
+            sbt +update +scalaCompilerBridgeBinaryJar && exit 0
+            [ "$attempt" = 3 ] || sleep 30
+          done
+          exit 1
 
       - uses: actions/setup-node@v6
         with:
@@ -75,14 +88,14 @@ jobs:
 
       - name: Check headers and formatting
         if: matrix.java == 'temurin@25' && matrix.os == 'ubuntu-22.04'
-        run: sbt headerCheckAll scalafmtCheckAll 'project /' scalafmtSbtCheck lucumaScalafmtCheck lucumaScalafixCheck
+        run: sbt headerCheckAll scalafmtCheckAll 'project /' scalafmtSbtCheck lucumaScalafmtCheck lucumaScalafixCheck lucumaSlackNotifyCheck
 
       - name: Check scalafix lints
         if: matrix.java == 'temurin@25' && matrix.os == 'ubuntu-22.04'
         run: sbt 'scalafixAll --check'
 
-      - name: Test
-        run: sbt test
+      - name: Test affected projects
+        run: sbt lucumaTestAffected
 
       - name: Check binary compatibility
         if: matrix.java == 'temurin@25' && matrix.os == 'ubuntu-22.04'
@@ -91,12 +104,6 @@ jobs:
       - name: Generate API documentation
         if: matrix.java == 'temurin@25' && matrix.os == 'ubuntu-22.04'
         run: sbt doc
-
-      - name: Aggregate coverage reports
-        run: sbt coverageReport coverageAggregate
-
-      - name: Upload code coverage data
-        uses: codecov/codecov-action@v6
 
       - name: Make target directories
         if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main')
@@ -139,10 +146,21 @@ jobs:
           distribution: temurin
           java-version: 25
           cache: sbt
+          cache-dependency-path: |
+            **/*.sbt
+            **/project/build.properties
+            **/project/**.scala
+            **/project/**.sbt
+            .github/workflows/ci.yml
 
       - name: sbt update
         if: matrix.java == 'temurin@25' && steps.setup-java-temurin-25.outputs.cache-hit == 'false'
-        run: sbt +update
+        run: |
+          for attempt in 1 2 3; do
+            sbt +update +scalaCompilerBridgeBinaryJar && exit 0
+            [ "$attempt" = 3 ] || sleep 30
+          done
+          exit 1
 
       - name: Download target directories (3)
         uses: actions/download-artifact@v6
@@ -177,3 +195,21 @@ jobs:
           SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
           SONATYPE_CREDENTIAL_HOST: ${{ secrets.SONATYPE_CREDENTIAL_HOST }}
         run: sbt tlCiRelease
+
+  required-checks:
+    name: REQUIRED CHECKS FOR BRANCH PROTECTION - AGGREGATED
+    needs: [build]
+    if: always()
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Fail if a required job did not pass
+        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
+        run: |
+          echo "::error::a required job did not pass"
+          exit 1
+
+      - name: Report success
+        run: echo "all of build passed or were skipped"
