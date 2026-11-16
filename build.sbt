@@ -1,10 +1,10 @@
 import scala.sys.process.*
 
-val scala3 = "3.8.4"
+val scala3 = "3.9.0"
 
 val ScalablyTypedCliVersion     = "1.0.0-beta45"
 val ScalablyTypedRuntimeVersion = "2.4.2"
-val ScalaJSReactVersion         = "4.0.0"
+val ScalaJSReactVersion         = "4.1.0"
 
 ThisBuild / tlBaseVersion      := "0.13"
 ThisBuild / crossScalaVersions := Seq(scala3)
