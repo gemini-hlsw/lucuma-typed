@@ -6,3 +6,5 @@ options/area.*
 options/areaspline.*
 options/line.*
 options/series.*
+modules/xrange.*
+options/xrange.*
